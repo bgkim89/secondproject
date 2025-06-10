@@ -2,3 +2,8 @@ folium
 streamlit-folium
 yfinance==0.1.63
 plotly
+numpy
+matplotlib
+scipy
+h5py
+gwpy
