@@ -1,4 +1,4 @@
 folium
 streamlit-folium
-yfinance
+yfinance==0.1.63
 plotly
