@@ -14,7 +14,7 @@ museums = {
         "lon": -0.1749,
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Science_Museum%2C_London.jpg/1280px-Science_Museum%2C_London.jpg",
         "homepage": "https://www.sciencemuseum.org.uk/",
-        "established": 1857,
+        "established": "1857", # 문자열로 통일
         "size": "약 45,000평방미터 (전시 공간)",
         "visitors": "약 300만 명/년 (코로나19 이전)",
         "fields": ["#산업혁명", "#기술사", "#의학", "#우주과학", "#에너지"],
@@ -29,7 +29,7 @@ museums = {
         "lon": 11.5833,
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Deutsches_Museum_Main_Building_Munich.jpg/1280px-Deutsches_Museum_Main_Building_Munich.jpg",
         "homepage": "https://www.deutsches-museum.de/en/",
-        "established": 1903,
+        "established": "1903", # 문자열로 통일
         "size": "약 60,000평방미터 (세계 최대 규모의 과학기술 박물관 중 하나)",
         "visitors": "약 150만 명/년 (코로나19 이전)",
         "fields": ["#항공우주", "#전력", "#기계공학", "#정보통신", "#자연과학"],
@@ -44,7 +44,7 @@ museums = {
         "lon": 2.3888,
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Citesciencesindustrie_paris.jpg/1280px-Citesciencesindustrie_paris.jpg",
         "homepage": "https://www.cite-sciences.fr/en/",
-        "established": 1986,
+        "established": "1986", # 문자열로 통일
         "size": "약 150,000평방미터 (유럽 최대 규모의 과학 박물관 중 하나)",
         "visitors": "약 300만 명/년 (코로나19 이전)",
         "fields": ["#환경과학", "#생명과학", "#뇌과학", "#디지털기술", "#천문학"],
@@ -59,7 +59,7 @@ museums = {
         "lon": 4.9126,
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Nemo_Science_Museum_Amsterdam.jpg/1280px-Nemo_Science_Museum_Amsterdam.jpg",
         "homepage": "https://www.nemosciencemuseum.nl/en/",
-        "established": 1997,
+        "established": "1997", # 문자열로 통일
         "size": "약 8,000평방미터 (전시 공간)",
         "visitors": "약 60만 명/년",
         "fields": ["#상호작용적전시", "#어린이교육", "#물리학원리", "#화학실험", "#기술혁신"],
@@ -74,7 +74,7 @@ museums = {
         "lon": 8.7061,
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Swiss_Science_Center_Technorama%2C_Winterthur%2C_Switzerland.jpg/1280px-Swiss_Science_Center_Technorama%2C_Winterthur%2C_Switzerland.jpg",
         "homepage": "https://www.technorama.ch/en/",
-        "established": 1982,
+        "established": "1982", # 문자열로 통일
         "size": "약 6,500평방미터 (전시 공간)",
         "visitors": "약 25만 명/년",
         "fields": ["#물리현상", "#화학반응", "#생물학실험", "#인지과학", "#체험학습"],
@@ -89,7 +89,7 @@ museums = {
         "lon": 2.1408,
         "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/CosmoCaixa_Barcelona_02.jpg/1280px-CosmoCaixa_Barcelona_02.jpg",
         "homepage": "https://cosmocaixa.caixaforum.org/en/",
-        "established": 2004 (기존 박물관 리모델링),
+        "established": "2004 (기존 박물관 리모델링)", # 이 부분을 문자열로 수정했습니다.
         "size": "약 30,000평방미터 (전시 공간)",
         "visitors": "약 80만 명/년",
         "fields": ["#자연사", "#생물다양성", "#우주과학", "#지구과학", "#환경보존"],
