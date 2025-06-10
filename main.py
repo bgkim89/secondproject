@@ -1,13 +1,13 @@
 import streamlit as st
 import folium
 from streamlit_folium import folium_static
-from PIL import Image
+from PIL import Image # Pillow 라이브러리 (이미지 처리에 사용)
 
 # --- Page Configuration ---
 st.set_page_config(
     page_title="스페인 북부 관광지 가이드 🇪🇸",
     page_icon="🇪🇸",
-    layout="wide"
+    layout="wide" # 넓은 레이아웃 사용
 )
 
 # --- Title and Introduction ---
@@ -19,8 +19,9 @@ st.markdown("""
 바스크 지방의 현대적인 예술부터 갈리시아의 순례길까지, 스페인 북부는 모든 여행자의 마음을 사로잡을 준비가 되어 있습니다!
 """)
 
+# 이미지 파라미터 수정: use_column_width -> use_container_width
 st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/San_Sebastian_Old_Town_2021.jpg/1280px-San_Sebastian_Old_Town_2021.jpg", 
-         caption="산세바스티안의 아름다운 구시가지 풍경", use_column_width=True)
+         caption="산세바스티안의 아름다운 구시가지 풍경", use_container_width=True)
 
 st.markdown("---")
 
@@ -100,7 +101,8 @@ for name, info in attractions.items():
     st.subheader(f"📍 {name}")
     col1, col2 = st.columns([1, 2])
     with col1:
-        st.image(info["image"], caption=name, use_column_width=True)
+        # 이미지 파라미터 수정: use_column_width -> use_container_width
+        st.image(info["image"], caption=name, use_container_width=True)
     with col2:
         st.write(info["description"])
     st.markdown("---")
