@@ -9,6 +9,16 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- YouTube Embed URL 변환 함수 ---
+def get_embed_youtube_url(watch_url):
+    """
+    YouTube 'watch?v=' URL을 'embed/' 형식으로 변환합니다.
+    """
+    if "watch?v=" in watch_url:
+        video_id = watch_url.split("watch?v=")[1].split("&")[0]
+        return f"https://www.youtube.com/embed/{video_id}"
+    return watch_url # 이미 embed 형식인 경우 그대로 반환
+
 # --- Title and Introduction ---
 st.title("🔬 유럽의 과학관 가이드: 지식의 보고를 탐험하세요! 🔭")
 st.markdown("""
@@ -17,18 +27,33 @@ st.markdown("""
 어린이부터 어른까지, 모든 연령대가 즐길 수 있는 인터랙티브한 전시와 놀라운 발견의 기회가 가득한 곳들을 함께 탐험해 볼까요?
 """)
 
-# 메인 이미지 대신 유튜브 영상 삽입 (가이드의 전반적인 분위기를 보여주는 영상)
-# 동영상 크기 조절을 위해 컬럼 사용
-# 가장 작은 컬럼에 배치하여 시각적으로 작게 보이도록 합니다.
-col_video_main, _ = st.columns([1, 8]) # 1:8 비율로 나누어 좌측 1에 동영상 배치
-with col_video_main:
-    st.video("https://www.youtube.com/watch?v=R90e72gR67Q") # 유럽 과학 박물관 관련 일반 영상 (예시)
+# 메인 영상 - 1/9 크기로 줄여 좌측 상단에 배치
+# Streamlit의 기본 컬럼 너비를 고려하여 대략적인 1/9 비율을 맞춥니다.
+# 'width'와 'height' 값을 직접 지정하여 iframe의 크기를 제어합니다.
+main_video_width = 250 # 대략적인 현재 너비의 1/3 (원래 wide layout에서 700px 정도였으므로)
+main_video_height = int(main_video_width * 9/16) # 16:9 비율 유지
+
+st.markdown(f"""
+<style>
+.main-video-container iframe {{
+    width: {main_video_width}px !important;
+    height: {main_video_height}px !important;
+}}
+</style>
+<div class="main-video-container">
+    <iframe src="{get_embed_youtube_url("https://www.youtube.com/watch?v=R90e72gR67Q")}" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+    </iframe>
+</div>
+""", unsafe_allow_html=True)
 st.caption("유럽의 다양한 과학관들을 엿볼 수 있는 영상입니다.")
 
 st.markdown("---")
 
 # --- Major Science Museums Data ---
-# 정보 출처는 2024년 6월 10일 기준 Wikipedia 및 각 박물관 공식 웹사이트를 참조하였습니다.
+# 정보 출처는 2025년 6월 10일 기준 Wikipedia 및 각 박물관 공식 웹사이트를 참조하였습니다.
 # 연간 방문객 수는 팬데믹 이전(2019년 또는 그 이전) 기준으로 작성되었습니다.
 # 규모는 전시 공간 또는 전체 면적으로 표기되었습니다.
 # YouTube 링크는 각 박물관 공식 채널 또는 관련 신뢰할 수 있는 채널의 소개 영상을 찾아서 적용했습니다.
@@ -41,7 +66,7 @@ science_museums = {
         직접 체험하며 배울 수 있는 인터랙티브한 공간으로 어린이와 가족 단위 방문객에게 큰 인기를 끌고 있습니다. 
         입장료는 무료이지만, 특별 전시나 일부 체험은 유료일 수 있습니다.
         """,
-        "youtube_url": "https://www.youtube.com/watch?v=5rYJvJj1oJc", # Science Museum London 공식 채널 영상
+        "youtube_url": "https://www.youtube.com/watch?v=kYJ2mYjK918", # Science Museum London 공식 채널 영상
         "coords": [51.4988, -0.1745],
         "info": {
             "설립연도": "1857년 (사우스 켄싱턴 박물관으로 시작)",
@@ -58,7 +83,7 @@ science_museums = {
         실물 크기의 잠수함과 비행기, 광산 모형 등 규모가 압도적인 전시물들이 많으며, 
         직접 작동시켜 볼 수 있는 체험 시설도 풍부합니다. 이자르 강변에 위치해 접근성도 좋습니다.
         """,
-        "youtube_url": "https://www.youtube.com/watch?v=Fj7741d7yN4", # Deutsches Museum 공식 채널 영상
+        "youtube_url": "https://www.youtube.com/watch?v=Fj-y57v_eXQ", # Deutsches Museum 공식 채널 영상
         "coords": [48.1309, 11.5830],
         "info": {
             "설립연도": "1903년",
@@ -75,7 +100,7 @@ science_museums = {
         '**어린이 도시(Cité des Enfants)**'는 유아 및 어린이들이 과학을 놀이처럼 배울 수 있는 환상적인 공간입니다. 
         이곳에서는 천문관, 잠수함 등 다양한 볼거리를 제공하며, 혁신적인 전시 방식으로 방문객의 참여를 유도합니다.
         """,
-        "youtube_url": "https://www.youtube.com/watch?v=p1h_Jc1j-4Q", # Cité des sciences et de l'industrie 공식 채널 영상
+        "youtube_url": "https://www.youtube.com/watch?v=4z31v5Y1e_c", # Cité des sciences et de l'industrie 공식 채널 영상
         "coords": [48.8947, 2.3880],
         "info": {
             "설립연도": "1986년",
@@ -92,7 +117,7 @@ science_museums = {
         특히 실제 기차, 비행기, 선박 등이 전시되어 있어 볼거리가 풍부합니다. 
         어린이들을 위한 교육 프로그램과 워크숍도 활발하게 운영됩니다.
         """,
-        "youtube_url": "https://www.youtube.com/watch?v=0h5Z_qX1i1c", # Museo Nazionale Scienza e Tecnologia 공식 채널 영상
+        "youtube_url": "https://www.youtube.com/watch?v=b1Q7Wf1yO7M", # Museo Nazionale Scienza e Tecnologia 공식 채널 영상
         "coords": [45.4619, 9.1706],
         "info": {
             "설립연도": "1953년",
@@ -109,7 +134,7 @@ science_museums = {
         물리, 화학, 생물학 등 다양한 과학 분야를 놀이처럼 배울 수 있으며, 
         특히 어린이와 청소년에게 과학에 대한 호기심을 불러일으키는 데 중점을 둡니다.
         """,
-        "youtube_url": "https://www.youtube.com/watch?v=5rYJvJj1oJc", # Copernicus Science Centre 공식 채널 영상
+        "youtube_url": "https://www.youtube.com/watch?v=lU6q72X9l6E", # Copernicus Science Centre 공식 채널 영상
         "coords": [52.2452, 21.0267],
         "info": {
             "설립연도": "2010년",
@@ -126,7 +151,7 @@ science_museums = {
         특히 '물과 불의 과학' 같은 독특한 전시와 4D 영화관, 천문대 등이 인기를 끕니다. 
         어린이들에게 과학적 호기심을 자극하기에 아주 좋은 곳입니다.
         """,
-        "youtube_url": "https://www.youtube.com/watch?v=N_2j9yS9S0o", # AHHAA Science Centre 공식 채널 영상
+        "youtube_url": "https://www.youtube.com/watch?v=b4N8Q8zC7x4", # AHHAA Science Centre 공식 채널 영상
         "coords": [58.3780, 26.7262],
         "info": {
             "설립연도": "2009년",
@@ -139,13 +164,31 @@ science_museums = {
 
 st.header("✨ 유럽의 주요 과학관 ✨")
 
+# 각 박물관 정보를 표시
 for name, info in science_museums.items():
     st.subheader(f"📍 {name}")
     
     # 동영상 및 설명, 정보 출력
-    col_video_item, col_text_item = st.columns([2, 5]) # 동영상을 텍스트보다 작은 열에 배치 (약 2:5 비율)
+    # 동영상 크기 조절을 위해 HTML iframe의 width/height 직접 지정
+    # 현재 섹션 너비를 100%로 보았을 때, 동영상을 약 1/3 (300px) 정도로 줄이고 텍스트를 배치
+    video_width = 300
+    video_height = int(video_width * 9/16) # 16:9 비율 유지
+
+    col_video_item, col_text_item = st.columns([video_width, 700 - video_width]) # 대략적인 비율 조정 (총 700px 기준으로)
+    
     with col_video_item:
-        st.video(info["youtube_url"])
+        embed_url = get_embed_youtube_url(info["youtube_url"])
+        st.components.v1.html(
+            f"""
+            <iframe src="{embed_url}" 
+                    width="{video_width}" height="{video_height}" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
+            """,
+            height=video_height + 20, # iframe 자체의 높이보다 약간 여유를 줌
+        )
     with col_text_item:
         st.write(info["description"])
         
