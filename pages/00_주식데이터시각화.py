@@ -33,21 +33,28 @@ def get_stock_data(tickers_dict, years=3):
     all_data = pd.DataFrame()
     for ticker, name in tickers_dict.items():
         try:
-            # 여기를 수정합니다: auto_adjust=False 추가
-            data = yf.download(ticker, start=start_date, end=end_date, auto_adjust=False)
+            data = yf.download(ticker, start=start_date, end=end_date, auto_adjust=False, progress=False) # progress=False 추가
             if not data.empty:
                 data['Ticker'] = ticker
                 data['Company'] = name
-                # 'Adj Close' 컬럼이 존재하면 사용하고, 없으면 'Close' 컬럼을 사용하도록 폴백 로직 추가
                 if 'Adj Close' in data.columns:
-                    all_data = pd.concat([all_data, data[['Adj Close', 'Ticker', 'Company']]])
-                elif 'Close' in data.columns: # 'Adj Close'가 없는 경우 'Close' 사용 (이미 조정된 값일 가능성 높음)
-                    data = data.rename(columns={'Close': 'Adj Close'}) # 컬럼 이름을 'Adj Close'로 변경
-                    all_data = pd.concat([all_data, data[['Adj Close', 'Ticker', 'Company']]])
+                    # NaN 값 제거 또는 처리 (정규화 전 중요)
+                    data = data.dropna(subset=['Adj Close']) # NaN 값 제거
+                    if not data.empty: # NaN 제거 후 데이터가 비어있지 않은지 다시 확인
+                        all_data = pd.concat([all_data, data[['Adj Close', 'Ticker', 'Company']]])
+                    else:
+                        st.warning(f"데이터를 가져왔으나 'Adj Close' 컬럼에 유효한 값이 없습니다: {name} ({ticker})")
+                elif 'Close' in data.columns:
+                    data = data.rename(columns={'Close': 'Adj Close'})
+                    data = data.dropna(subset=['Adj Close']) # NaN 값 제거
+                    if not data.empty: # NaN 제거 후 데이터가 비어있지 않은지 다시 확인
+                        all_data = pd.concat([all_data, data[['Adj Close', 'Ticker', 'Company']]])
+                    else:
+                        st.warning(f"데이터를 가져왔으나 'Close' 컬럼에 유효한 값이 없습니다: {name} ({ticker})")
                 else:
                     st.warning(f"데이터를 가져왔으나 'Adj Close' 또는 'Close' 컬럼이 없습니다: {name} ({ticker})")
             else:
-                st.warning(f"데이터를 가져오지 못했습니다: {name} ({ticker})")
+                st.warning(f"데이터를 가져오지 못했습니다 (빈 데이터): {name} ({ticker})")
         except Exception as e:
             st.warning(f"Error downloading data for {name} ({ticker}): {e}")
     return all_data
@@ -71,6 +78,7 @@ if not df_stocks.empty:
         )
 
     if selected_tickers:
+        # 선택된 티커의 데이터만 필터링
         filtered_df = df_stocks[df_stocks['Ticker'].isin(selected_tickers)].copy()
 
         normalize = st.checkbox("주가 정규화 (시작점 100)", value=False)
@@ -79,15 +87,27 @@ if not df_stocks.empty:
             normalized_data = pd.DataFrame()
             for ticker in selected_tickers:
                 ticker_df = filtered_df[filtered_df['Ticker'] == ticker].copy()
-                if not ticker_df.empty:
+                
+                # --- 주가 정규화 로직 개선 시작 ---
+                if not ticker_df.empty and 'Adj Close' in ticker_df.columns:
                     initial_price = ticker_df['Adj Close'].iloc[0]
-                    if initial_price != 0:
+                    if initial_price != 0 and pd.notnull(initial_price): # initial_price가 0이 아니고 NaN이 아닌지 확인
                         ticker_df['Adj Close Normalized'] = (ticker_df['Adj Close'] / initial_price) * 100
+                        normalized_data = pd.concat([normalized_data, ticker_df])
                     else:
-                        ticker_df['Adj Close Normalized'] = 0
-                    normalized_data = pd.concat([normalized_data, ticker_df])
-            plot_column = 'Adj Close Normalized'
-            y_axis_title = '정규화된 주가 (시작점 100)'
+                        st.warning(f"'{TICKERS[ticker]}' ({ticker})의 시작 주가가 0이거나 유효하지 않아 정규화할 수 없습니다.")
+                else:
+                    st.warning(f"'{TICKERS[ticker]}' ({ticker})의 주가 데이터를 찾을 수 없거나 'Adj Close' 컬럼이 없어 정규화할 수 없습니다.")
+                # --- 주가 정규화 로직 개선 끝 ---
+
+            if not normalized_data.empty: # 정규화된 데이터가 하나라도 있는지 확인
+                filtered_df = normalized_data # 정규화된 데이터로 교체
+                plot_column = 'Adj Close Normalized'
+                y_axis_title = '정규화된 주가 (시작점 100)'
+            else:
+                st.warning("선택된 기업 중 정규화할 수 있는 데이터가 없습니다. 원본 주가를 표시합니다.")
+                plot_column = 'Adj Close'
+                y_axis_title = '주가 (USD)'
         else:
             plot_column = 'Adj Close'
             y_axis_title = '주가 (USD)'
@@ -97,9 +117,9 @@ if not df_stocks.empty:
         for ticker in selected_tickers:
             company_df = filtered_df[filtered_df['Ticker'] == ticker]
             
-            # 정규화된 데이터가 없거나, 해당 컬럼이 없는 경우 건너뛰기
+            # 시각화할 컬럼이 존재하는지 확인
             if plot_column not in company_df.columns or company_df[plot_column].empty:
-                st.warning(f"시각화할 데이터가 없습니다: {TICKERS[ticker]} ({ticker})")
+                st.warning(f"'{TICKERS[ticker]}' ({ticker})에 대한 시각화 데이터가 없습니다.")
                 continue
 
             fig.add_trace(go.Scatter(
@@ -109,15 +129,18 @@ if not df_stocks.empty:
                 name=f"{TICKERS[ticker]} ({ticker})"
             ))
 
-        fig.update_layout(
-            title="글로벌 시총 상위 기업 주가 추이",
-            xaxis_title="날짜",
-            yaxis_title=y_axis_title,
-            hovermode="x unified",
-            legend_title="기업",
-            height=600
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        if fig.data: # 그래프에 최소한 하나의 트레이스가 있는지 확인
+            fig.update_layout(
+                title="글로벌 시총 상위 기업 주가 추이",
+                xaxis_title="날짜",
+                yaxis_title=y_axis_title,
+                hovermode="x unified",
+                legend_title="기업",
+                height=600
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.warning("선택된 기업 중 시각화할 수 있는 유효한 데이터가 없습니다.")
 
     else:
         st.info("시각화할 기업을 하나 이상 선택해주세요.")
